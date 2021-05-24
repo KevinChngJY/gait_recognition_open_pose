@@ -49,6 +49,9 @@ Below is the configuration of my camera when recording my dataset:
 | 10 | Number of Observations | 10 Observations/recordings per each person |
 | 11 | In/Outdoor | Outdoor |
 
+#### you may refer to my steps to record the data using Intel Realsense d435i:
+
+
 ---
 
 ## SECTION 4 : Getting Started with OpenPose
