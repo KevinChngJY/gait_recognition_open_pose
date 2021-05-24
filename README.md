@@ -52,10 +52,27 @@ Below is the configuration of my camera when recording my dataset:
 ---
 
 ## SECTION 4 : Getting Started with OpenPose
+### Guide to OpenPose for Real-time Human Pose Estimation
+
+In this section, we will walk you through how can we get the skeleton links of human using OpenPose.
+
+#### Introduction to Openpose
+
+OpenPose is a Real-time multiple-person detection library, and it’s the first time that any library has shown the capability of jointly detecting human body, face, and foot keypoints. Thanks to Gines Hidalgo, Zhe Cao, Tomas Simon, Shih-En Wei, Hanbyul Joo, and Yaser Sheikh for making this project successful and this library is very much dependent on the CMU Panoptic Studio dataset. OpenPose is written in C++ and Caffe. Today we are going to see a very popular library with almost a 19.8k star and 6k fork on Github: OpenPose with a small implementation in python, the authors have created many builds for different operating systems and languages. You can try it in your local machine with GPU or without GPU, with Linux or without Linux.
+
+There are many features of OpenPose library let’s see some of the most remarkable ones:
+* Real-time 2D multi-person keypoint detections.
+* Real-time 3D single-person keypoint detections.
+* Included a Calibration toolbox for estimation of distortion, intrinsic, and extrinsic camera parameters.
+* Single-person tracking for speeding up the detection and visual smoothing.
+
+#### Steps to use Openpose
 
 ---
 
 ## SECTION 5 : G3D de-projection using Depth Image
+
+![image](https://user-images.githubusercontent.com/28354028/119386323-f3514400-bcf9-11eb-8ed7-112624125c32.png)
 
 ---
 
