@@ -50,7 +50,7 @@ Below is the configuration of my camera when recording my dataset:
 | 11 | In/Outdoor | Outdoor |
 
 #### you may refer to my steps to record the data using Intel Realsense d435i:
-
+1) Install Intel RealSense SDK 2.0 with Intel RealSense Viewer
 
 ---
 
