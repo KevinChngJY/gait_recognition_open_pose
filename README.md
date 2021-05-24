@@ -9,12 +9,12 @@
 ## SECTION 2 : POSTER
 ## Contents
 
-Section 3) Acquire sequence of RGBD and Depth Image fom Intel RealSense
-Section 4) Getting Started with OpenPose
-Section 5) 3D de-projection using Depth Image
-Section 6) Features Extraction
-Section 7) Potential approaches to Gait Recognition
-Section 8) Conclusion
+Section 3) Acquire sequence of RGBD and Depth Image fom Intel RealSense <br>
+Section 4) Getting Started with OpenPose <br>
+Section 5) 3D de-projection using Depth Image <br>
+Section 6) Features Extraction <br>
+Section 7) Potential approaches to Gait Recognition <br>
+Section 8) Conclusion <br>
 
 ---
 
