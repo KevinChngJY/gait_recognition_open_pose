@@ -25,12 +25,12 @@ Section 8) Conclusion <br>
 
 ## SECTION 3 : Acquire sequence of RGBD and Depth Image from Intel RealSense
 
-3 different RGBD cameras you may consider :
-(1) Microsoft Kinect : https://www.microsoft.com/en-us/p/azure-kinect-dk/8pp5vxmd9nhq?activetab=pivot%3aoverviewtab
-(2) Intel® RealSense™ Depth Camera D435 : https://www.intelrealsense.com/compare-depth-cameras/
-(3) ZED Stereo Camera (StereoLabs) : https://www.stereolabs.com/zed/
+3 different RGBD cameras you may consider : <br>
+(1) Microsoft Kinect : https://www.microsoft.com/en-us/p/azure-kinect-dk/8pp5vxmd9nhq?activetab=pivot%3aoverviewtab <br>
+(2) Intel® RealSense™ Depth Camera D435 : https://www.intelrealsense.com/compare-depth-cameras/ <br>
+(3) ZED Stereo Camera (StereoLabs) : https://www.stereolabs.com/zed/ <br>
 
-They have well-support package for preprocessing, colour-allignment, etc. However, you may get your own depth camera to follow this tutorial.
+They have well-support package for preprocessing, colour-allignment, etc. However, you may get your own depth camera to follow this tutorial. <br>
 For this tutorial, i use Intel RealSense d435i. 
 
 Below is the configuration of my camera when recording my dataset:
