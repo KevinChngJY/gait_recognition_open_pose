@@ -70,6 +70,7 @@ There are many features of OpenPose library let’s see some of the most remarka
 * Single-person tracking for speeding up the detection and visual smoothing.
 
 #### Steps to use Openpose
+![link](https://github.com/KevinChngJY/gait_recognition_open_pose/blob/main/section4_record_data)
 
 ---
 
