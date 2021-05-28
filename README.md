@@ -99,9 +99,60 @@ pip install pyrealsense2
 More python example:
 https://dev.intelrealsense.com/docs/python2
 
+Please refer to the code below to see my example how to extract the images(RGB and Depth) :
+
+```
+import pyrealsense2 as rs
+
+bag_path = "path_to_your_bag_file.bag"
+config = rs.config()
+config.enable_devcie_from_file(bag_path, repeat_playback=False)
+pipleline = res.pipeline()
+profile = pipeline.start(config)
+playback = profile.get_device().as_playback()
+playback.set_real_time(False)
+colorizer = rs.colorizer()
+align = rs.align(rs.stream.depth)
+duration = playback.get_duration().seconds * 1E9 + playback.get_duration().microseconds * 1E3
+duration = round(duration/1E6)
+elapsed = 0
+is_present, frames = pipeline.try_wait_for_frames()
+while is_present:
+            ts = frames.timestamp
+            if ts in t:
+                is_present, frames = pipeline.try_wait_for_frames()
+                continue
+            playback.pause()
+            frames = align.process(frames)
+            this = int(playback.get_position()/1E6)-elapsed
+            pbar.update(this)
+            elapsed += this
+            t.append(ts)
+            frames = align.process(frames)
+            color_frame = frames.get_color_frame()
+            color_image = np.asanyarray(color_frame.get_data())
+            # color_image = cv2.cvtColor(color_image, cv2.COLOR_BGR2RGB)
+            depth_frame = frames.get_depth_frame()
+            depth_image = colorizer.colorize(depth_frame)
+            depth_image = np.asanyarray(depth_image.get_data())
+            # .copy() is critical
+            q.append([ts,
+                      color_image.copy(), 
+                      np.asanyarray(depth_frame.get_data()).copy(), 
+                      depth_image.copy()])
+            playback.resume()
+            is_present, frames = pipeline.try_wait_for_frames()
+        pipeline.stop()
+        pbar.update(duration-elapsed)
+        pbar.close()
+
+```
+
+
+
 ---
 
-## SECTION 5 : Getting Started with OpenPose
+## SECTION 6 : Getting Started with OpenPose
 ### Guide to OpenPose for Real-time Human Pose Estimation
 
 In this section, we will walk you through how can we get the skeleton links of human using OpenPose.
@@ -117,7 +168,12 @@ There are many features of OpenPose library let’s see some of the most remarka
 * Single-person tracking for speeding up the detection and visual smoothing.
 
 #### Steps to use Openpose
-![link](https://github.com/KevinChngJY/gait_recognition_open_pose/blob/main/section4_record_data)
+1) Overview of OpenPose of CMU-Perceptual-Computing-Lab ; https://github.com/CMU-Perceptual-Computing-Lab/openpose. <br>
+2) Download the source code from https://github.com/CMU-Perceptual-Computing-Lab/openpose/releases <br>
+
+If your laptop don't have GPU, you may download the cpu version, however, it use extremely long time to process the skeleton detection compared to GPU.
+
+3)
 
 ---
 
