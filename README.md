@@ -16,15 +16,21 @@ In this tutorial, it demonstrates some ideas to perform person identification/re
 
 Section 3) Pre-requisites/software/languages
 Section 4) Acquire sequence of RGBD and Depth Image fom Intel RealSense <br>
-Section 5) Getting Started with OpenPose <br>
-Section 6) 3D de-projection using Depth Image <br>
-Section 7) Features Extraction <br>
-Section 8) Potential approaches to Gait Recognition <br>
-Section 9) Conclusion <br>
+Section 5): Getting started with Intel® RealSense™ SDK 2.0 (v2.44.0) <br>
+Section 6) Getting Started with OpenPose <br>
+Section 7) 3D de-projection using Depth Image <br>
+Section 8) Features Extraction <br>
+Section 9) Potential approaches to Gait Recognition <br>
+Section 10) Conclusion <br>
 
 ---
 
-## SECTION 3 : Acquire sequence of RGBD and Depth Image from Intel RealSense
+## SECTION 3 : Pre-requisites/software/languages
+
+
+---
+
+## SECTION 4 : Acquire sequence of RGBD and Depth Image from Intel RealSense
 
 3 different RGBD cameras you may consider : <br>
 (1) Microsoft Kinect : https://www.microsoft.com/en-us/p/azure-kinect-dk/8pp5vxmd9nhq?activetab=pivot%3aoverviewtab <br>
@@ -67,7 +73,7 @@ Video is recorded in the bag file. later we will use Intel Real Sense library to
 
 ---
 
-## SECTION 4 : Getting started with Intel® RealSense™ SDK 2.0 (v2.44.0)
+## SECTION 5 : Getting started with Intel® RealSense™ SDK 2.0 (v2.44.0)
 
 Overview : https://github.com/IntelRealSense/librealsense/releases/tag/v2.44.0
 
