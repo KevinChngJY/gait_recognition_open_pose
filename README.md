@@ -50,7 +50,20 @@ Below is the configuration of my camera when recording my dataset:
 | 11 | In/Outdoor | Outdoor |
 
 #### you may refer to my steps to record the data using Intel Realsense d435i:
-1) Install Intel RealSense SDK 2.0 with Intel RealSense Viewer
+1) Install Intel RealSense SDK 2.0 with Intel RealSense Viewer : https://github.com/IntelRealSense/librealsense/releases/tag/v2.44.0
+if your OS is window, you may direct download the exe here : https://github.com/IntelRealSense/librealsense/releases/download/v2.44.0/Intel.RealSense.Viewer.exe
+2) After connecting Intel Real Sense camera to you computer via USB, open the installed Intel RealSense Viewer :
+
+![image](https://user-images.githubusercontent.com/28354028/119943254-5cb8a780-bfc5-11eb-809a-7c60f3afc069.png)
+
+After configuring the camera setting, you may start to record your video.
+
+3) Where is your recorded video or file? you may change the recorded folder.
+
+![image](https://user-images.githubusercontent.com/28354028/119943467-aacdab00-bfc5-11eb-81ce-89743ed764a8.png)
+
+Video is recorded in the bag file. later we will use Intel Real Sense library to extract the image (RGB and depth)
+
 
 ---
 
