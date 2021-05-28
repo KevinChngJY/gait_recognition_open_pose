@@ -64,10 +64,29 @@ After configuring the camera setting, you may start to record your video.
 
 Video is recorded in the bag file. later we will use Intel Real Sense library to extract the image (RGB and depth)
 
+---
+
+## SECTION 4 : Getting started with Intel® RealSense™ SDK 2.0 (v2.44.0)
+
+Overview : https://github.com/IntelRealSense/librealsense/releases/tag/v2.44.0
+
+Supported Languages : <br>
+1) C++ 11 (GCC 5 / Visual Studio 2015 Update 3) <br>
+2) C <br>
+3) Python 2.7 / 3.5/ 3.6 / 3.7 / 3.8 / 3.9 (learn more) <br>
+4) Node.js <br>
+5) ROS <br>
+6) LabVIEW (learn more) <br>
+7) .NET (learn more) <br>
+8) Unity (learn more) <br>
+9) Matlab (learn more) <br>
+10) OpenNI2 (learn more) <br>
+11) Unreal Engine 4 (learn more) <br>
+
 
 ---
 
-## SECTION 4 : Getting Started with OpenPose
+## SECTION 5 : Getting Started with OpenPose
 ### Guide to OpenPose for Real-time Human Pose Estimation
 
 In this section, we will walk you through how can we get the skeleton links of human using OpenPose.
@@ -87,17 +106,17 @@ There are many features of OpenPose library let’s see some of the most remarka
 
 ---
 
-## SECTION 5 : G3D de-projection using Depth Image
+## SECTION 6 : G3D de-projection using Depth Image
 
 ![image](https://user-images.githubusercontent.com/28354028/119386323-f3514400-bcf9-11eb-8ed7-112624125c32.png)
 
 ---
 
-## SECTION 6 : Features Extraction
+## SECTION 7 : Features Extraction
 
 ---
 
-## SECTION 7 : Potential approaches to Gait Recognition
+## SECTION 8 : Potential approaches to Gait Recognition
 
 ---
 
