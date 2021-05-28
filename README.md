@@ -80,16 +80,24 @@ Overview : https://github.com/IntelRealSense/librealsense/releases/tag/v2.44.0
 Supported Languages : <br>
 1) C++ 11 (GCC 5 / Visual Studio 2015 Update 3) <br>
 2) C <br>
-3) Python 2.7 / 3.5/ 3.6 / 3.7 / 3.8 / 3.9 (learn more) <br>
-4) Node.js <br>
-5) ROS <br>
-6) LabVIEW (learn more) <br>
-7) .NET (learn more) <br>
-8) Unity (learn more) <br>
-9) Matlab (learn more) <br>
-10) OpenNI2 (learn more) <br>
-11) Unreal Engine 4 (learn more) <br>
+3) Python 2.7 / 3.5/ 3.6 / 3.7 / 3.8 / 3.9  :  https://github.com/IntelRealSense/librealsense/tree/development/wrappers/python <br>
+4) Node.js : https://github.com/IntelRealSense/librealsense/tree/development/wrappers/nodejs <br>
+5) ROS : https://github.com/IntelRealSense/realsense-ros/releases <br>
+6) LabVIEW : https://github.com/IntelRealSense/librealsense/tree/development/wrappers/labview<br>
+7) .NET : https://github.com/IntelRealSense/librealsense/tree/development/wrappers/csharp<br>
+8) Unity : https://github.com/IntelRealSense/librealsense/tree/development/wrappers/unity<br>
+9) Matlab : https://github.com/IntelRealSense/librealsense/tree/development/wrappers/matlab<br>
+10) OpenNI2 : https://github.com/IntelRealSense/librealsense/tree/development/wrappers/openni2 <br>
+11) Unreal Engine 4 : https://github.com/IntelRealSense/librealsense/tree/development/wrappers/unrealengine4 <br>
 
+In this project, we are using python in anaconda, please install pyrealsense2 package in your environment:
+
+```
+pip install pyrealsense2
+```
+
+More python example:
+https://dev.intelrealsense.com/docs/python2
 
 ---
 
