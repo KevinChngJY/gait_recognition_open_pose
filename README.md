@@ -14,12 +14,13 @@ In this tutorial, it demonstrates some ideas to perform person identification/re
 
 ## SECTION 2 : Contents
 
-Section 3) Acquire sequence of RGBD and Depth Image fom Intel RealSense <br>
-Section 4) Getting Started with OpenPose <br>
-Section 5) 3D de-projection using Depth Image <br>
-Section 6) Features Extraction <br>
-Section 7) Potential approaches to Gait Recognition <br>
-Section 8) Conclusion <br>
+Section 3) Pre-requisites/software/languages
+Section 4) Acquire sequence of RGBD and Depth Image fom Intel RealSense <br>
+Section 5) Getting Started with OpenPose <br>
+Section 6) 3D de-projection using Depth Image <br>
+Section 7) Features Extraction <br>
+Section 8) Potential approaches to Gait Recognition <br>
+Section 9) Conclusion <br>
 
 ---
 
