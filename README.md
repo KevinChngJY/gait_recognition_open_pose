@@ -102,53 +102,104 @@ https://dev.intelrealsense.com/docs/python2
 Please refer to the code below to see my example how to extract the images(RGB and Depth) :
 
 ```
+# First import the library
 import pyrealsense2 as rs
+import tqdm
+import numpy as np
 
+# your bag file path
 bag_path = "path_to_your_bag_file.bag"
+
+# Create a config and get the configure from bag file
 config = rs.config()
-config.enable_devcie_from_file(bag_path, repeat_playback=False)
-pipleline = res.pipeline()
+config.enable_device_from_file(bag_path, repeat_playback=False)
+
+# Create a pipeline
+pipleline = rs.pipeline()
+
+# Start the pipeline streaming according to the configuration
 profile = pipeline.start(config)
+
+# set real time mode to false
 playback = profile.get_device().as_playback()
 playback.set_real_time(False)
+
+# get the colorizer filter
+# it is the filter generate colour image based on input depth frame
 colorizer = rs.colorizer()
+
+# Get the Align Object
 align = rs.align(rs.stream.depth)
+
+#Get the duration of video
 duration = playback.get_duration().seconds * 1E9 + playback.get_duration().microseconds * 1E3
 duration = round(duration/1E6)
 elapsed = 0
+
+# Wait until a new set of frames becomes available.
 is_present, frames = pipeline.try_wait_for_frames()
+
+# Create a for loop until New frame is not available
 while is_present:
+            # Get the timestamp from frame
             ts = frames.timestamp
+            
+            # if there is duplicate processing on the same frame, then skip
             if ts in t:
+                # Wait until a new set of frames becomes available.
                 is_present, frames = pipeline.try_wait_for_frames()
                 continue
+            
+            # pause the playback for our algorithm to process
             playback.pause()
+            
+            # align the depth frame to color frame
             frames = align.process(frames)
+            
+            # update the progress bar
             this = int(playback.get_position()/1E6)-elapsed
             pbar.update(this)
             elapsed += this
+            
+            # apppend time frame to list of t
             t.append(ts)
-            frames = align.process(frames)
+            
+            # get the colour frame and assign to numpy array
             color_frame = frames.get_color_frame()
             color_image = np.asanyarray(color_frame.get_data())
-            # color_image = cv2.cvtColor(color_image, cv2.COLOR_BGR2RGB)
+            
+            # get the depth image and color it using color filter, assign to numpy array
             depth_frame = frames.get_depth_frame()
             depth_image = colorizer.colorize(depth_frame)
             depth_image = np.asanyarray(depth_image.get_data())
+            
+            # assign timeframe, colour image, depth image(original), depth image (colorize) to q 
             # .copy() is critical
             q.append([ts,
                       color_image.copy(), 
                       np.asanyarray(depth_frame.get_data()).copy(), 
                       depth_image.copy()])
+                      
+            # resumt back the playback
             playback.resume()
+            
+            # Wait until a new set of frames becomes available
             is_present, frames = pipeline.try_wait_for_frames()
+        
+        # stop the pipeline streaming
         pipeline.stop()
+        
+        # update the progress bar and close it
         pbar.update(duration-elapsed)
         pbar.close()
 
 ```
 
-
+We save the following information to variable "q" from bag file:
+1) Time Stemp
+2) Colour Image (Numpy Array)
+3) Depth Image (Original - Numpy Array)
+4) Depth Image (After Applying filter - Numpy Array)
 
 ---
 
