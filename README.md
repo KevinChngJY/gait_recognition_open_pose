@@ -100,6 +100,7 @@ More python example:
 https://dev.intelrealsense.com/docs/python2
 
 Please refer to the code below to see my example how to extract the images(RGB and Depth) :
+[Please take note the annotation to understand them better]
 
 ```
 # First import the library
@@ -195,6 +196,7 @@ while is_present:
 
 ```
 
+
 We save the following information to variable "q" from bag file:
 1) Time Stemp
 2) Colour Image (Numpy Array)
@@ -224,7 +226,140 @@ There are many features of OpenPose library let’s see some of the most remarka
 
 If your laptop don't have GPU, you may download the cpu version, however, it use extremely long time to process the skeleton detection compared to GPU.
 
-3)
+3) After downloading the folder, please navigate to the folder "openpose\models" to run the batch script.
+
+![image](https://user-images.githubusercontent.com/28354028/123106659-666de780-d46b-11eb-937a-747eb2ce963e.png)
+
+4) you may refer to my script to extract the information of skeleton using openpose :
+
+```
+
+# First import the library
+import cv2
+import pyrealsense2 as rs
+import os, sys
+from tqdm import tqdm
+
+# Import OpenPose
+# change the path below accordingly to your downloaded folder
+sys.path.append(os.getcwd() + '/openpose/bin/python/openpose/Release');
+os.environ['PATH']  = os.environ['PATH'] + ';' + os.getcwd() + '/openpose/bin;'
+import pyopenpose as op
+
+# Get OpenPose Object
+openpose = op.WrapperPython()
+
+# Configure the object
+openpose.configure({'model_folder': './openpose/models', 'display': '0', })
+
+# start openpose
+openpose.start()
+
+# Visualization - colour of skeleton
+clr = [[0, 255, 0], [0, 255, 255], [0, 0, 255], 
+            [0, 255, 0], [0, 255, 255], [0, 0, 255], 
+            [255, 0, 0], [255, 255, 0], [255, 0, 255], 
+            [255, 0, 0], [255, 255, 0], [255, 0, 255], ]            
+
+# rs bag file name
+rsbag = "20210520_222950.bag"
+
+# Variable declaration
+pclr = {}
+person_library = {}
+results[rsbag] = []
+
+# loop over the q - variable "q" is obtaineed from previous script
+for i, (ts, image, depth, colorized) in tqdm(enumerate(q[:]),total=len(q[:]),position=0, leave=True, desc=f'Processing openpose'):
+        
+        # Create pipine for image insert into openpose
+        datum = op.Datum()
+        
+        # read the image
+        datum.cvInputData = image
+        openpose.emplaceAndPop(op.VectorDatum([datum]))
+        
+        # if there is no detection from openpose
+        if datum.poseKeypoints is None:
+            results[rsbag].append((ts, None, None, None))
+            continue
+        
+        skel = cv2.cvtColor(image.copy(), cv2.COLOR_BGR2RGB)
+        
+        # 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13
+        pose_pairs = op.getPosePartPairs(op.PoseModel.BODY_25)
+        pose_pairs = zip(pose_pairs[:-1:2], pose_pairs[1::2])
+        pose_pairs = list(pose_pairs)[:14]
+        
+        # Declare Variable
+        plinks, persons, centers = {}, {}, {}
+        taken = []
+        
+        for person in np.arange(datum.poseKeypoints.shape[0]):
+            plink = np.zeros((len(pose_pairs), 2, 2)).astype(np.int32)
+            # plink[:] = np.nan
+            for plink_i, (link0, link1) in enumerate(pose_pairs):
+                is_confident = datum.poseKeypoints[person, link0, 2] * datum.poseKeypoints[person, link1, 2]
+                if not is_confident:
+                    continue
+                pt0 = np.around(datum.poseKeypoints[person, link0, :2]).astype(np.int32)
+                pt1 = np.around(datum.poseKeypoints[person, link1, :2]).astype(np.int32)
+                plink[plink_i,0,:], plink[plink_i,1,:] = pt0, pt1
+            plink = rearrange_links(plink)
+            x, y = plink[:,:,0].flatten(), plink[:,:,1].flatten()
+            x, y = x[(x!=0)&(~np.isnan(x))], y[(y!=0)&(~np.isnan(y))]
+            if not x.shape[0] or not y.shape[0]:
+                # skip person
+                continue
+            x0, y0 = x.min(), y.min()
+            x1, y1 = x.max(), y.max()
+            # perform tracking
+            if is_tracking:
+                crop = cv2.cvtColor(image[y0:y1+1,x0:x1+1,:].copy(), cv2.COLOR_BGR2GRAY)
+                if crop.shape[0] == 0:
+                    continue
+                ids = perform_tracking(person_library, image, (x0, y0), (x1, y1))
+                id = [id for id in ids if id not in taken]
+                if len(id) == 0:
+                    continue
+                id = id[0]
+                taken.append(id)
+                person_library[id] = crop
+            else:
+                id = person
+            plink_3d, center_3d = de_project(plink, depth, instrinsics)
+            centers[id] = center_3d
+            persons[id] = plink_3d
+            plinks[id] = plink
+            if is_plot:
+                for clr_i, (pt0, pt1) in enumerate(plink):
+                    if 0 in [*pt0, *pt1]:
+                        continue
+                    pt0, pt1 = tuple(pt0), tuple(pt1)
+                    cv2.line(skel, pt0, pt1, clr[clr_i], 3, cv2.LINE_AA)
+                    cv2.circle(skel, pt0, 5, [255, 255, 255], -1, cv2.LINE_AA)
+                    cv2.circle(skel, pt1, 5, [0, 0, 0], 1, cv2.LINE_AA)
+                if id not in pclr:
+                    pclr[id] = np.random.uniform(0, 255, 3)
+                cv2.rectangle(skel, (x0, y0), (x1, y1), pclr[id], 2)
+                cv2.putText(skel, str(id), (x0, y0-10), cv2.FONT_HERSHEY_SIMPLEX, 1, pclr[id], 2)
+        if is_plot:
+            view = np.hstack([skel, colorized])
+            cv2.putText(view, str(i+1), (10, 40), cv2.FONT_HERSHEY_SIMPLEX, 1, np.random.uniform(0, 255, 3), 2)
+            cv2.imshow('Stream', view)
+            cv2.waitKey(1)
+        results[rsbag.split(os.path.sep)[-1]].append((ts, plinks, persons, centers))
+    cv2.destroyAllWindows()
+    openpose.stop()
+    return results
+          
+                                               
+
+
+
+
+```
+
 
 ---
 
