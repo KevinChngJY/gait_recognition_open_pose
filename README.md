@@ -1,7 +1,7 @@
 
 ---
 
-## SECTION 1 : PROJECT TITLE
+## SECTION 1 : PROJECT TITLE (Drafting)
 ## Gait Recognition
 
 Gait recognition refers to the use of video of human gait, processed by computer vision methods, to recognize or to identify persons based on their body shape and walking styles. This is a passive mode of acquiring biometric data from a distance. It requires an ambient set-up. A RGBD Camera (Intel Realsense) is used to record 2D-image and depth- image of one's walking. With openpose, we extract the skeleton links from 2D-image and restructure to 3D skeleton information using depth-image.
