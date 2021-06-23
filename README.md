@@ -367,14 +367,173 @@ for i, (ts, image, depth, colorized) in tqdm(enumerate(q[:]),total=len(q[:]),pos
 
 ![image](https://user-images.githubusercontent.com/28354028/119386323-f3514400-bcf9-11eb-8ed7-112624125c32.png)
 
+```
+
+def de_project(links, depth, intrinsics, pad=0, max_link_length=1000):
+    #  Intrinsic of "Color" / 640x480 / {YUYV/RGB8/BGR8/RGBA8/BGRA8/Y16}
+    #   Width:      	640
+    #   Height:     	480
+    #   PPX:        	320.625366210938
+    #   PPY:        	243.673263549805
+    #   Fx:         	381.666015625
+    #   Fy:         	381.309906005859
+    #   Distortion: 	Inverse Brown Conrady
+    #   Coeffs:     	-0.0551249980926514  	0.0641890242695808  	0.000465646124212071  	-0.000292466895189136  	-0.0203048214316368  
+    #   FOV (deg):  	79.95 x 64.37
+    # intrinsics = rs.intrinsics()
+    # intrinsics.width, intrinsics.height = 640, 480
+    # intrinsics.ppx, intrinsics.ppy = 320.625366210938, 243.673263549805
+    # intrinsics.fx, intrinsics.fy = 381.666015625, 381.309906005859
+    # intrinsics.model = rs.distortion.inverse_brown_conrady
+    # intrinsics.coeffs = [-0.0551249980926514, 
+    #                     0.0641890242695808, 
+    #                     0.000465646124212071, 
+    #                     -0.000292466895189136, 
+    #                     -0.0203048214316368]
+    persons = []
+    for (w0, h0), (w1, h1) in links:
+        if 0 in [w0, h0, w1, h1]:
+            persons.append([[np.nan, np.nan, np.nan], [np.nan, np.nan, np.nan]])
+            continue
+        h0_lwr = h0 - pad if h0 - pad >= 0 else 0
+        h0_upr = h0 + pad + 1 if h0 + pad + 1 <= depth.shape[0] else depth.shape[0]
+        w0_lwr = w0 - pad if w0 - pad >= 0 else 0
+        w0_upr = w0 + pad + 1 if w0 + pad + 1 <= depth.shape[1] else depth.shape[1]
+        h1_lwr = h1 - pad if h1 - pad >= 0 else 0
+        h1_upr = h1 + pad + 1 if h1 + pad + 1 <= depth.shape[0] else depth.shape[0]
+        w1_lwr = w1 - pad if w1 - pad >= 0 else 0
+        w1_upr = w1 + pad + 1 if w1 + pad + 1 <= depth.shape[1] else depth.shape[1]
+        d0 = depth[h0_lwr:h0_upr, w0_lwr:w0_upr].flatten()
+        d1 = depth[h1_lwr:h1_upr, w1_lwr:w1_upr].flatten()
+        d0, d1 = d0[d0!=0], d1[d1!=0]
+        if d0.shape[0] * d1.shape[0] == 0:
+            persons.append([[np.nan, np.nan, np.nan], [np.nan, np.nan, np.nan]])
+            continue
+        d0, d1 = d0.min(), d1.min()
+        x0, y0, z0 = rs.rs2_deproject_pixel_to_point(intrinsics, [w0, h0], d0)
+        x1, y1, z1 = rs.rs2_deproject_pixel_to_point(intrinsics, [w1, h1], d1)
+        if np.linalg.norm([x1-x0, y1-y0, z1-z0]) > max_link_length:
+            persons.append([[np.nan, np.nan, np.nan], [np.nan, np.nan, np.nan]])
+            continue
+        persons.append([[x0, y0, z0], [x1, y1, z1]])
+    center = np.array(persons).reshape([12, 6])
+    center = center[~np.any(np.isnan(center), axis=1)]
+    center = center.reshape([center.shape[0], 2, 3])
+    if center.shape[0] == 0:
+        center = np.array([np.nan, np.nan, np.nan])
+    else:
+        center = np.median(center.mean(axis=1), axis=0)
+    return persons, center
+
+```
+
 ---
 
-## SECTION 7 : Features Extraction
+## SECTION 7 : Tracking (Optional)
+
+
+```
+
+def perform_tracking(person_library, detect_image, top_left_xy, bottom_right_xy, ratio_thresh=0.7):
+    (x0, y0), (x1, y1) = top_left_xy, bottom_right_xy
+    # gray
+    detect_image = cv2.cvtColor(detect_image.copy(), cv2.COLOR_BGR2GRAY)
+    # features
+    sift = cv2.xfeatures2d.SIFT_create()
+    kp2, dc2 = sift.detectAndCompute(detect_image, None)
+    scores = []
+    for fixed_id, mug_shot in person_library.items():
+        kp1, dc1 = sift.detectAndCompute(mug_shot, None)
+        # matching
+        index_params = dict(algorithm=0, trees=5)
+        search_params = dict()
+        flann = cv2.FlannBasedMatcher(index_params, search_params)
+        # flann
+        matches = flann.knnMatch(dc1, dc2, k=2)
+        # if dc1 is None or dc2 is None:
+        #     continue
+        # if dc1.shape[0] <= 1 or dc2.shape[0] <= 1:
+        #     continue
+        # try:
+        #     matches = flann.knnMatch(dc1, dc2, k=2)
+        # except cv2.error:
+        #     print(dc1, dc2)
+        #     continue
+        good_points = []
+        for match in matches:
+            m, n = match
+            if m.distance < ratio_thresh * n.distance:
+                kp2_idx = m.trainIdx
+                x, y = int(kp2[kp2_idx].pt[0]), int(kp2[kp2_idx].pt[1])
+                if x0 <= x <= x1 and y0 <= y <= y1:
+                    good_points.append((x, y))
+        if len(good_points) > 0:
+            scores.append((fixed_id, len(good_points)))
+    if len(scores) == 0:
+        new_id = [len(person_library)]
+    else:
+        new_id = sorted(scores, key=itemgetter(1), reverse=True)
+        new_id = list(map(itemgetter(0), new_id))
+    return new_id
+
+
+```
 
 ---
 
-## SECTION 8 : Potential approaches to Gait Recognition
+## SECTION 8 : Features Extraction
+
+```
+
+def get_df(datum):
+    # convert links to unit vectors
+    vectors, timestamp, distance = [], [], []
+    for links in datum:
+        frame_vector = []
+        for link in links:
+            t, d, a, b = link[0], link[3::3].mean(), link[1:4], link[4:]
+            ab = b - a
+            mag = np.linalg.norm(ab)
+            ab = ab / mag if mag else np.array([np.nan, np.nan, np.nan])
+            frame_vector.append(ab)
+        vectors.append(frame_vector)
+        timestamp.append(t)
+        distance.append(d)
+    vectors = np.array(vectors)
+    distance = np.array(distance[1:])
+    # find rotation axis and rotation angle and interval
+    a, b = vectors[:-1], vectors[1:]
+    cross = np.cross(a, b)
+    mag = np.linalg.norm(cross, axis=2)
+    angle = np.arcsin(mag)
+    mag = mag.reshape([*mag.shape, 1])
+    mag = np.concatenate([mag, mag, mag], axis=2)
+    cross /= mag
+    r_axis_signal = cross
+    r_angle_signal = angle
+    interval = np.diff(timestamp)
+    # column
+    combo = [['RSH', 'RUA', 'RLA', 'LSH', 'LUA', 'LLA', 'RHI', 'RTH', 'RCA', 'LHI', 'LTH', 'LCA'], 
+            ['X', 'Y', 'Z']]
+    index = pd.MultiIndex.from_product(combo, names=['link', 'axis'])
+    # index
+    t_delta = []
+    ctr = 0
+    for i in interval:
+        ctr += i/1000
+        t_delta.append(ctr)
+    t_delta = pd.TimedeltaIndex(t_delta, unit='s')
+    # create dataframe
+    rot = pd.DataFrame(r_axis_signal.reshape(r_axis_signal.shape[0], 36), columns=index, index=t_delta)
+    ang = pd.DataFrame(np.column_stack([distance.reshape(-1, 1), r_angle_signal]), columns=['DST']+combo[0], index=t_delta)
+    return rot, ang
+
+```
 
 ---
 
-## SECTION 8 : Conclusion
+## SECTION 9 : Potential approaches to Gait Recognition
+
+---
+
+## SECTION 10 : Conclusion
